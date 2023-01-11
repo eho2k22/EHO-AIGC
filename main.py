@@ -172,8 +172,8 @@ def home():
                     print ("Success!! Image GCS URL = " + img_gcs_url)
         
         
-        supa_url = os.environ['SUPABASE_URL']
-        supa_key = os.environ['SUPABASE_KEY']
+        #supa_url = os.environ['SUPABASE_URL']
+        #supa_key = os.environ['SUPABASE_KEY']
 
         #img_name = str(artifact.seed)+ ".png"
 
