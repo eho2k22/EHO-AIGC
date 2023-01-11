@@ -18,6 +18,22 @@ import os
 import random
 import datetime
 
+# Imports the Google Cloud client library
+from google.cloud import storage
+
+# Instantiates a client
+#storage_client = storage.Client()
+storage_client = storage.Client.from_service_account_json("eho-ai-84268c0bb21b.json")
+
+# The name for storage bucket
+bucket_name = "eho-ai.appspot.com"
+
+bucket = storage_client.bucket(bucket_name)
+
+bs = io.BytesIO()
+
+img_gcs_url = ""
+
 
 app = Flask(__name__)
 
@@ -143,26 +159,34 @@ def home():
                     "Please modify the prompt and try again.")
                 if artifact.type == generation.ARTIFACT_IMAGE:
                     img = Image.open(io.BytesIO(artifact.binary))
-                    img.save("tmp/" + str(artifact.seed)+ ".png") #Save our generated images with their seed number as the filename.
+                    #img.save("tmp/" + str(artifact.seed)+ ".png") #Save our generated images with their seed number as the filename.
                     #img.save(usertitle + ".png")
                     print("Your Image saved as :  " +str(artifact.seed)+ ".png")
                     img_name = str(artifact.seed)+ ".png"
+
+                    print("About to save your image to Google Cloud Storage..")
+                    bs = io.BytesIO()
+                    img.save(bs, "png")
+                    bucket.blob(img_name).upload_from_string(bs.getvalue(), content_type="image/png")
+                    img_gcs_url = bucket.blob(img_name).public_url
+                    print ("Success!! Image GCS URL = " + img_gcs_url)
         
-        supa_url = "https://ekodaqvkctdbgkvdbfrp.supabase.co"
-        supa_key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVrb2RhcXZrY3RkYmdrdmRiZnJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NjMyNjQ1MTUsImV4cCI6MTk3ODg0MDUxNX0.C6nXaYCs0ieotVgdVPG8Gn9PjJq5iO8geMjGY71Avmk"
+        
+        supa_url = os.environ['SUPABASE_URL']
+        supa_key = os.environ['SUPABASE_KEY']
 
         #img_name = str(artifact.seed)+ ".png"
 
-        print("Your AIGC Image Name = " + img_name)
-        supabase = create_client(supa_url, supa_key)
+        #print("Your AIGC Image Name = " + img_name)
+        #supabase = create_client(supa_url, supa_key)
 
         #file = open("992446758.png", "r")
         # data = supabase.storage().from_("public/training-data").download("test.txt")
         # print(data)
 
-        supabase.storage().from_("ai-images").upload(img_name, "tmp/"+img_name)
+        #supabase.storage().from_("ai-images").upload(img_name, "tmp/"+img_name)
 
-        return render_template("result.html", img_name=img_name, usertitle=usertitle, userprompt=userprompt)
+        return render_template("result.html", img_name=img_gcs_url, usertitle=usertitle, userprompt=userprompt)
 
     return render_template("home.html")
 
