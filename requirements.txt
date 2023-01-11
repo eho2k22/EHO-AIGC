@@ -1,0 +1,8 @@
+# requirements.txt 
+
+aiohttp==3.8.3
+supabase-client==0.2.5
+supabase==0.7.1
+Flask==2.0.2
+stability-sdk==0.3.1
+Pillow==9.4.0
