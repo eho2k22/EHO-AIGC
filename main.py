@@ -1,5 +1,5 @@
 
-#main2.py
+#main.py
 
 #from flask import Flask
 
@@ -143,7 +143,7 @@ def home():
                     "Please modify the prompt and try again.")
                 if artifact.type == generation.ARTIFACT_IMAGE:
                     img = Image.open(io.BytesIO(artifact.binary))
-                    img.save(str(artifact.seed)+ ".png") #Save our generated images with their seed number as the filename.
+                    img.save("tmp/" + str(artifact.seed)+ ".png") #Save our generated images with their seed number as the filename.
                     #img.save(usertitle + ".png")
                     print("Your Image saved as :  " +str(artifact.seed)+ ".png")
                     img_name = str(artifact.seed)+ ".png"
@@ -160,7 +160,7 @@ def home():
         # data = supabase.storage().from_("public/training-data").download("test.txt")
         # print(data)
 
-        supabase.storage().from_("ai-images").upload(img_name, img_name)
+        supabase.storage().from_("ai-images").upload(img_name, "tmp/"+img_name)
 
         return render_template("result.html", img_name=img_name, usertitle=usertitle, userprompt=userprompt)
 
