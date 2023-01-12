@@ -23,7 +23,7 @@ from google.cloud import storage
 
 # Instantiates a client
 #storage_client = storage.Client()
-storage_client = storage.Client.from_service_account_json("eho-ai-84268c0bb21b.json")
+storage_client = storage.Client.from_service_account_json("tmp/hi.json")
 
 # The name for storage bucket
 bucket_name = "eho-ai.appspot.com"
